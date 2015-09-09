@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8"/>
+	<!--
+	This is free and unencumbered software released into the public domain.
+
+	Anyone is free to copy, modify, publish, use, compile, sell, or
+	distribute this software, either in source code form or as a compiled
+	binary, for any purpose, commercial or non-commercial, and by any
+	means.
+
+	In jurisdictions that recognize copyright laws, the author or authors
+	of this software dedicate any and all copyright interest in the
+	software to the public domain. We make this dedication for the benefit
+	of the public at large and to the detriment of our heirs and
+	successors. We intend this dedication to be an overt act of
+	relinquishment in perpetuity of all present and future rights to this
+	software under copyright law.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+	EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+	IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+	OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+	ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+	OTHER DEALINGS IN THE SOFTWARE.
+
+	For more information, please refer to <http://unlicense.org/>
+	-->
+	<meta name="generator" content="Notepad++"/>
+	<title>BandDiagram.js</title>
+	<style>
+		#container{
+			width:100%;
+			height:100%;
+		}
+	</style>
+	<script type="application/javascript;version=1.7" src="./svg.js"></script>
+	<script type="application/javascript;version=1.7" src="./BandDiagram.js"></script>
+	<script type="application/javascript;version=1.7" src="./AutoKeyedStorage.js"></script>
+</head>
+<body>
+	<a id="container"></a>
+	<script type="application/javascript;version=1.7">
+		"use strict";
+		let container=document.getElementById("container");
+		let materials=new AutoKeyedStorage(
+			new Material({Fermi:-4.9},"ITO")//transparent conductive oxide, p-type
+			,new Material({HOMO:-5.1, LUMO:-3.5, Fermi:-5.0},"PEDOT:PSS")//organic conjugated polymer, p-type
+			,new Material({HOMO : -5.2,LUMO : -3.2,Fermi : -4.39}, "P3HT")//p-type organic semiconductor: poly(3-hexyl)thiophene
+			,new Material({HOMO : -6.1,LUMO : -3.7,Fermi : -4.44}, "PCBM")//n-type organic semiconductor: [6,6]-phenyl C61 butyric acid methyl ester
+			,new Material({Fermi:-4.26},"Ag")
+			,new Material({Fermi:-4.06},"Al")
+		);
+		let structDesc="ITO/P3HT/PCBM/Al";
+		let h=new Hetero(structDesc.split("/").map(ln => materials[ln]).filter((e)=>!!e));
+		document.title+=": "+h.layers.map(l => l.name).join("/");
+		h.align();
+		//h.align("vacuum");
+		const mime="image/svg+xml";
+		let svg=h.draw(null,500,500,50)
+		container.appendChild(svg);
+		let blob=new Blob(['<?xml version="1.0"?>\n',svg.outerHTML],{type:mime});
+		container.href=URL.createObjectURL(blob);
+		container.download=structDesc+".svg";
+		container.type=mime;
+	</script>
+</body>
+</html>
