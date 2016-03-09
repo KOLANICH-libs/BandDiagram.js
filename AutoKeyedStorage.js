@@ -25,15 +25,18 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 For more information, please refer to <http://unlicense.org/>
 */
-function AutoKeyedStorage(...materials){
-	this.add(...materials);
-	return new Proxy(this,this.proxyHandler);
-}
-AutoKeyedStorage.prototype.deriveKey=function(el){
-	return el.name;
-}
-AutoKeyedStorage.prototype.add=function(...layers){
-	layers.map(l=>this._map.set(this.deriveKey(l),l));
+class AutoKeyedStorage{
+	constructor(...materials){
+		this.add(...materials);
+		return new Proxy(this,this.proxyHandler);
+	}
+	deriveKey(el){
+		return el.name;
+	}
+	add(...layers){
+		layers.map(l=>this._map.set(this.deriveKey(l),l));
+	}
+	*[Symbol.iterator](){yield* AutoKeyedStorage.prototype.proxyHandler.iterate(this)};//for now
 }
 AutoKeyedStorage.prototype._map=new Map();
 AutoKeyedStorage.prototype.proxyHandler={
@@ -65,4 +68,3 @@ AutoKeyedStorage.prototype.proxyHandler={
 		return target._map.delete(key);
 	}
 };
-AutoKeyedStorage.prototype[Symbol.iterator]=function*(){yield* AutoKeyedStorage.prototype.proxyHandler.iterate(this)};//for now
